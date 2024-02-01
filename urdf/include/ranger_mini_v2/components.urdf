@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!--
+Software License Agreement (BSD)
+
+\file      components.urdf
+\authors   Achala Athukorala <chhathuranga@gmail.com>
+\copyright Copyright (c) 2024, Singapore University of Technology and Design
+
+Parts of this URDF has been obtained from https://github.com/westonrobot/ugv_gazebo_sim
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Robot Base -->
+    <xacro:macro name="robot_base" params="link_name">
+        <link name="${link_name}">
+            <inertial>
+                <origin xyz="0.0 0.0 0.0"/>
+                <mass value="10"/>
+                <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="1.57 0 3.14 " />
+                <geometry>
+                    <mesh filename="file://$(find ranger_mini_v2_description)/meshes/components/ranger_base.dae" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 -0.1" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.5 0.35 0.2"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+
+
+    <!-- Type-A Wheel Assembly : Bike-front like Left wheel -->
+    <xacro:macro name="wheel_assembly_a" params="prefix parent_link x y z roll pitch yaw">
+
+        <link name="${prefix}_steering">
+            <inertial>
+                <origin xyz="0.0 0.0 0.0"/>
+                <mass value="1"/>
+                <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+            </inertial>
+            <visual>
+                <origin xyz="-0.23 -0.194 0.1" rpy="1.57 0 3.14 " />
+                <geometry>
+                        <mesh filename="file://$(find ranger_mini_v2_description)/meshes/components/wheel_assembly_a.dae" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="0.001" length="0.001"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="${prefix}_steering_joint" type="revolute">
+            <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}" />
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_steering"/>
+            <axis xyz="0 0 1" rpy="0 0 0" />
+            <limit effort="5" velocity="6.28"  lower="-2.1" upper="2.1" />
+        </joint>
+
+        <xacro:wheel prefix="${prefix}" parent_link="${prefix}_steering" x="0.03" y="0.01" z="-0.12" roll="0" pitch="0" yaw="0"/>
+
+    </xacro:macro>
+
+    <!-- Type-B Wheel Assembly : Bike-front like Right wheel -->
+    <xacro:macro name="wheel_assembly_b" params="prefix parent_link x y z roll pitch yaw">
+
+        <link name="${prefix}_steering">
+            <inertial>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <mass value="1"/>
+                <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+            </inertial>
+            <visual>
+                <origin xyz="-0.23 0.194 0.1" rpy="1.57 0 3.14 " />
+                <geometry>
+                    <mesh filename="file://$(find ranger_mini_v2_description)/meshes/components/wheel_assembly_b.dae" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="0.001" length="0.001"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="${prefix}_steering_joint" type="revolute">
+            <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}" />
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_steering"/>
+            <axis xyz="0 0 1" rpy="0 0 0" />
+            <limit effort="5" velocity="6.28"  lower="-2.1" upper="2.1" />
+        </joint>
+
+        <xacro:wheel prefix="${prefix}" parent_link="${prefix}_steering" x="0.0" y="0.0" z="-0.12" roll="0" pitch="0" yaw="0"/>
+
+    </xacro:macro>
+
+    <!-- Wheel -->
+    <xacro:macro name="wheel" params="prefix parent_link x y z roll pitch yaw">
+        <link name="${prefix}_wheel">
+            <inertial>
+                <mass value="8" />
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.1171" ixy="0" ixz="0" iyy="0.1361" iyz="0" izz="0.1171" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+                <geometry>
+                    <cylinder length="0.01" radius="0.01" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+                <geometry>
+                    <cylinder length="0.08" radius="0.08" />
+                </geometry>
+                <contact>
+                    <ode>
+                        <min_depth>0.001</min_depth>
+                    </ode>
+                </contact>
+            </collision>
+        </link>
+
+        <joint name="${prefix}_wheel_joint" type="continuous">
+            <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}" />
+            <parent link="${parent_link}"/>
+            <child link="${prefix}_wheel"/>
+            <axis xyz="0 1 0" rpy="0 0 0" />
+        </joint>
+    </xacro:macro>
+
+</robot>
+
+
